@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="layout/default_layout">
+
+  <th:block layout:fragment="content">
+	<div class="container">
+	
+		
+		<div th:if="${user}!=null" style="float: right;">
+			<a class="btn btn-outline-info mt-3 mb-3" href="/board/write" role="button" style="margin-left: 20px;">글쓰기</a>
+		</div>
+		<div th:if="${user}==null" style="float: right;">
+			<a class="btn btn-outline-info mt-3 mb-3" th:onclick="writeBtn()">글쓰기</a>
+		</div>
+		
+		<table class="table table-hover" style="text-align: center;">
+		  <thead class="table-light">
+		    <tr>
+		      <th scope="col">제목</th>
+		      <th scope="col">작성일</th>
+		      <th scope="col">조회수</th>
+		      <th scope="col">좋아요</th>
+		    </tr>
+		  </thead>
+		  <tbody class="table-group-divider">
+		    <tr th:each="board : ${boards}" th:onclick="|location.href='/board?boardNo=${board.id}'|">
+		    	<td th:text="${board.title}"></td>
+		    	<td th:text="${board.writeDate}"></td>
+		    	<td th:text="${board.viewCount}"></td>
+		    	<td th:text="${board.likeCount}"></td>
+		    </tr>
+		  </tbody>
+		</table>
+		
+		
+		<nav aria-label="Page navigation">
+			<ul class="pagination justify-content-center">
+			    <li class="page-item">
+			      <a class="page-link" th:href="@{|/?pageNum=${pageDto.startPage - 1}|}" th:if="${pageDto.prev}">이전</a>
+			    </li>
+			    <li class="page-item disabled">
+			      <a class="page-link" th:href="@{|/?pageNum=${pageDto.startPage - 1}|}" th:if="!${pageDto.prev}">이전</a>
+			    </li>
+			    <li class="page-item" th:each="pageNum : ${#numbers.sequence(pageDto.startPage, pageDto.endPage)}">
+			       <a class="page-link" th:href="@{'/?pageNum=' + ${pageNum}}" th:text="${pageNum}"></a>
+			    </li>
+			    <li class="page-item disabled">
+			      <a class="page-link" th:href="@{|/?pageNum=${pageDto.endPage + 1}|}" th:if="!${pageDto.next}">다음</a>
+			    </li>
+			    <li class="page-item">
+			      <a class="page-link" th:href="@{|/?pageNum=${pageDto.endPage + 1}|}" th:if="${pageDto.next}">다음</a>
+			    </li>
+			 </ul>
+		</nav>
+
+		
+		
+	</div>
+	
+	<script>
+        function writeBtn() {
+        	alert("로그인을 해야 글을 작성하실 수 있습니다.");
+        };
+    </script>
+	
+  </th:block>
+  
+</html>

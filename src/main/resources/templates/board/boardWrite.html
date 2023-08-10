@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="layout/default_layout">
+<div>
+  <th:block layout:fragment="content">
+    <div class ="container-xl mb-3">
+		<form th:if="${board}==null" action="/api/board/write" method="post">
+			<div class="input-group" style="height: 40px;">
+  				<span class="input-group-text">제목</span>
+  				<input type="text" class="form-control" id="title" name="title" aria-describedby="passwordHelpInline"></input>
+			</div>
+			<div class="input-group mt-3">
+  				<span class="input-group-text" style="background-color: white;">내용</span>
+  			 	<textarea class="form-control" id="body" name="body" rows="25"></textarea>
+			</div>
+			<div>
+				<a class="btn btn-light mt-3" href="javascript:history.back();">취소</a>
+				<button type="submit" class="btn btn-dark mt-3"  style="float: right;">저장</button>
+			</div>
+		</form>
+		
+		<form th:if="${board}!=null" th:action="@{|/api/board/update?boardNo=${board.id}|}" method="post">
+			<div class="input-group" style="height: 40px;">
+  				<span class="input-group-text">제목</span>
+  				<input type="text" class="form-control" id="title" name="title" th:value="${board.title}"></input>
+			</div>
+			<div class="input-group mt-3">
+  				<span class="input-group-text" style="background-color: white;">내용</span>
+  			 	<textarea class="form-control" id="body" name="body" rows="25" th:text="${board.body}"></textarea>
+			</div>
+			<div>
+				<a class="btn btn-light mt-3" href="javascript:history.back();">취소</a>
+				<button type="submit" class="btn btn-dark mt-3"  style="float: right;">저장</button>
+			</div>
+		</form>
+	</div>
+  </th:block>
+</div>
+</html>

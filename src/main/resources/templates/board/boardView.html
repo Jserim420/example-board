@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="layout/default_layout">
+<div>
+  <th:block layout:fragment="content">
+  <div class="container">
+  <div class="justify-content-center">
+	 <div class="card text-bg-light mb-3 " style="max-width:1500px; max-height:1000px;">
+	  <h5 class="card-header" th:text="${board.title}">제목</h5>
+		  <div class="card-body" style="height: 700px;">
+		    <p class="card-title"  style="text-align: right;" th:text="'작성자 : ' + ${writer}">작성자</p>
+		    <p class="card-title"  style="text-align: right;" th:text="'조회수 : ' + ${board.viewCount}">작성자</p>
+		    <h6 class="card-text" th:text="${board.body}">내용</h6>
+		  </div>
+		  <div class="card-footer text-body-secondary bg-transparent border-secondary" style="text-align: right;" th:text="${board.writeDate}">작성일</div>
+	</div>
+		    
+	<div class="mt-3" style="margin-bottom: 100px;">
+		<div style="float:left;"><a href="/" class="btn btn-primary">목록</a></div>
+		<div style="float:right;"><a th:text="${board.likeCount}" style="margin-right:5px;"></a><a class="btn btn-primary" th:href="@{|/api/board/like?boardNo=${board.id}|}">좋아요</a></div>
+		<div style="float:right;">
+		<div th:if="${user}!=null">
+		<div th:if="${user.id}==${board.userId}">
+			<a class="btn btn-outline-danger" th:onclick="deleteBoard([[ ${board.id} ]])" style="float: right;">삭제</a>
+			<a class="btn btn-outline-warning" th:onclick="modifyBoard([[ ${board.id} ]])" style="float: right; margin-right: 5px;">수정</a>
+    	</div>
+    	</div>
+    </div>
+    </div>
+	
+	<div class="accordion" id="accordionExample">
+	  <div class="accordion-item">
+	    <h2 class="accordion-header">
+	      <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
+	        댓글
+	      </button>
+	     </h2>
+	  <div id="collapseOne" class="accordion-collapse collapse show" data-bs-parent="#accordionExample">
+	  <div th:if="${comments}!=null" th:each="comment : ${comments}" style="margin: 15px;">
+		  <div><p th:text="${comment.body}">내용</p>
+		  <div style="text-align: right;">
+			  <a th:text="${comment.userName}">작성자</a>
+		   </div>
+		  </div>
+		  <hr>
+		</div>
+	</div>
+	</div>
+	</div>
+     
+    <div class="card mt-3">
+  	<div class="card-body">
+    <form th:action="@{|/api/comment/write?boardNo=${board.id}|}" method="post">
+	    <div class="row row-cols-2" >
+		    <div class="form-floating col mb-3" >
+			  <input th:if="${user}==null" type="text" class="form-control" id="name" name="name" placeholder="닉네임" value="익명"  style="height: 50px;">
+			  <input th:if="${user}!=null" type="text" class="form-control" id="name" name="name" placeholder="닉네임" th:value="${user.name}"  style="height: 50px;">
+			  <label for="floatingInput"  style="margin-left:10px; margin-top:-5px;">작성자</label>
+			</div>
+			<div class="form-floating col">
+			  <input type="password" class="form-control" id="password" name="password" placeholder="4자이상" style="height: 50px;">
+			  <label for="floatingPassword" style="margin-left:10px; margin-top:-5px;">비밀번호</label>
+			</div>
+		</div>
+		   <div class="input-group">
+			 <textarea class="form-control" placeholder="댓글" id="body" name="body" style="height: 70px"></textarea>
+			 <button class="btn btn-outline-secondary" type="submit" id="button-addon2">작성</button>
+		</div>
+	</form>  
+	</div>
+	</div> 
+ 
+  </div> 
+  </div>
+ 	
+ 	<script th:inline="javascript">
+ 	function deleteBoard(id) {
+ 		if(confirm("삭제하시겠습니까?")==true) {
+ 			window.location.href ='/board/delete?boardNo=' + id;
+ 			alert("삭제되었습니다.");
+ 		} else return;
+ 	};
+ 	
+ 	function modifyBoard(id) {
+ 		if(confirm("수정하시겠습니까?")==true) {
+ 			window.location.href = '/board/modify?boardNo=' + id;
+ 		}
+ 	};
+ 	
+ 	</script>
+ 	</div>
+  </th:block>
+  </html>
