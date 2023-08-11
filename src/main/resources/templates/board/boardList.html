@@ -3,15 +3,23 @@
       layout:decorate="layout/default_layout">
 
   <th:block layout:fragment="content">
-	<div class="container">
+	<div class="container" style="margin-bottom: 50px;">
 	
-		
-		<div th:if="${user}!=null" style="float: right;">
-			<a class="btn btn-outline-info mt-3 mb-3" href="/board/write" role="button" style="margin-left: 20px;">글쓰기</a>
-		</div>
-		<div th:if="${user}==null" style="float: right;">
-			<a class="btn btn-outline-info mt-3 mb-3" th:onclick="writeBtn()">글쓰기</a>
-		</div>
+		<form class="mb-3" role="search" style="padding-left:400px;" action="/board/keyword" method="get">
+		<div class="row ">
+		    <div class="col-4">
+		    <select id="selected" name="selected" class="form-select">
+		      <option selected>제목</option>
+		      <option>내용</option>
+		    </select>
+		    </div>
+      		<div class="col-6">
+      			<input class="form-control me-2" type="search" id="keyword" name="keyword" 
+      			placeholder="검색어" aria-label="Search" style="margin-left:-20px;">
+      			</div>
+      		<button class="col-2 btn btn-outline-secondary" type="submit" style="margin-left:-30px;">찾기</button>
+    	</div>
+    	</form>
 		
 		<table class="table table-hover" style="text-align: center;">
 		  <thead class="table-light">
@@ -32,8 +40,16 @@
 		  </tbody>
 		</table>
 		
+		<div  style="float: right;">
+			<a class="btn btn-outline-info mt-3 mb-3" href="/board/write" role="button" style="margin-left: 20px;">글쓰기</a>
+		</div>
 		
-		<nav aria-label="Page navigation">
+		
+		<div th:if="${pageDto.endPage}<1">
+		<p class="nav justify-content-center"> 작성된 글이 없습니다.</p>
+		</div>
+		
+		<nav th:if="${pageDto.endPage}>0" aria-label="Page navigation">
 			<ul class="pagination justify-content-center">
 			    <li class="page-item">
 			      <a class="page-link" th:href="@{|/?pageNum=${pageDto.startPage - 1}|}" th:if="${pageDto.prev}">이전</a>
@@ -42,7 +58,8 @@
 			      <a class="page-link" th:href="@{|/?pageNum=${pageDto.startPage - 1}|}" th:if="!${pageDto.prev}">이전</a>
 			    </li>
 			    <li class="page-item" th:each="pageNum : ${#numbers.sequence(pageDto.startPage, pageDto.endPage)}">
-			       <a class="page-link" th:href="@{'/?pageNum=' + ${pageNum}}" th:text="${pageNum}"></a>
+			       <a th:if="${keyword}==null" class="page-link" th:href="@{'/?pageNum=' + ${pageNum}}" th:text="${pageNum}"></a>
+			       <a th:if="${keyword}!=null" class="page-link" th:href="@{'/board/keyword?selected=' + ${selected} + '&keyword=' + ${keyword} + '&pageNum=' + ${pageNum}}" th:text="${pageNum}"></a>
 			    </li>
 			    <li class="page-item disabled">
 			      <a class="page-link" th:href="@{|/?pageNum=${pageDto.endPage + 1}|}" th:if="!${pageDto.next}">다음</a>
@@ -52,16 +69,12 @@
 			    </li>
 			 </ul>
 		</nav>
+		
 
 		
 		
 	</div>
 	
-	<script>
-        function writeBtn() {
-        	alert("로그인을 해야 글을 작성하실 수 있습니다.");
-        };
-    </script>
 	
   </th:block>
   

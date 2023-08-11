@@ -1,5 +1,6 @@
 package com.example.exampleboard.controller;
 
+
 import java.io.IOException;
 import java.util.Date;
 import java.util.List;
@@ -14,6 +15,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 import com.example.exampleboard.AlertMessage;
 import com.example.exampleboard.model.Board;
 import com.example.exampleboard.model.Comment;
+import com.example.exampleboard.model.PageDto;
+import com.example.exampleboard.model.Pagination;
 import com.example.exampleboard.model.User;
 import com.example.exampleboard.repository.UserRepository;
 import com.example.exampleboard.service.BoardService;
@@ -38,7 +41,7 @@ public class BoardController {
 
 	
 	@GetMapping("/board/write")
-	public String boardWrite(@CookieValue(name = "userId", required = false) Long userId, Model model, User user) {
+	public String boardWrite(@CookieValue(name = "userId", required = false) Long userId, Model model, User user, HttpServletResponse response) throws Exception {
 		System.out.println(userId);
 		if (userId != null) {  
 			User loginUser = userRepository.findById(userId).get();
@@ -47,9 +50,11 @@ public class BoardController {
 			return "board/boardWrite";
 		}
 		else  { 
+			AlertMessage.alertAndBack(response, "로그인을 해야 글을 작성하실 수 있습니다.");
 			model.addAttribute("user", null);
-			return "redirect:/";
 		}
+
+		return "redirect:/";
 	
 	}
 	
@@ -137,5 +142,40 @@ public class BoardController {
 	public String updateLike(@RequestParam(name="boardNo") Long id, Board board, BoardForm boardForm, HttpServletResponse response) throws Exception {
 		boardService.updateLikeCount(id);
 		return "redirect:/board?boardNo=" + id;
+	}
+	
+	@GetMapping("/board/keyword")
+	public String search(@CookieValue(name="userId",  required = false) Long userId,
+			Model model,
+			@RequestParam(name="selected") String selected,
+			@RequestParam(name="keyword") String keyword,
+			@RequestParam(name="pageNum", defaultValue = "1") int pageNum,
+			@RequestParam(defaultValue = "10") int pageSize,
+			HttpServletResponse response) throws Exception {
+		
+		 if (userId != null) {
+		        User loginUser = userRepository.findById(userId).orElse(null);
+		        model.addAttribute("user", loginUser);
+		    } else {
+		        model.addAttribute("user", null);
+		    }
+		 
+		 if(keyword.equals("")) AlertMessage.alertAndBack(response, "검색어를 입력해주세요.");
+		 else {
+		    int totalData = boardService.keywordSize(selected, keyword);
+		    System.out.println("사이즈 : " + totalData);
+		    Pagination pagination = new Pagination(pageNum, pageSize);
+		    
+		    System.out.println("페이지 당 글 개수 : " + pagination.getAmount());
+		    List<Board> boards = boardService.findKeywordPage(selected, keyword, pageNum, pagination.getAmount());
+		    
+		    PageDto pageDto = new PageDto(pagination, totalData);
+		    model.addAttribute("pageDto", pageDto);
+		    System.out.println(pageDto.toString());
+		    model.addAttribute("boards",boards);
+		    model.addAttribute("keyword", keyword);
+		    model.addAttribute("selected", selected);
+		 }
+		    return "board/boardList";
 	}
 }

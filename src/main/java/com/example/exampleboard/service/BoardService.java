@@ -36,6 +36,14 @@ public class BoardService {
 		return boardRepository.findByBoardPage(offset);
 	}
 	
+	public List<Board> findKeywordPage(String selected, String keyword, int pageNum, int pageSize) {
+		int offset = (pageNum - 1) * pageSize;
+		System.out.println("offset : " + offset);
+		return boardRepository.findByKeyword(selected, keyword, offset);
+	}
+	
+	
+	
 	public void remove(Long id) {
 		boardRepository.delete(id);
 	}
@@ -50,6 +58,10 @@ public class BoardService {
 	
 	public void updateLikeCount(Long id) {
 		boardRepository.setLikeCount(id);
+	}
+	
+	public int keywordSize(String selected, String keyword) {
+		return boardRepository.findByKeywordSize(selected,keyword);
 	}
 }
 	

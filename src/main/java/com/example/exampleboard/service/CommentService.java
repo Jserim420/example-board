@@ -18,6 +18,22 @@ public class CommentService {
 	}
 	
 	public List<Comment> findByAllComments(Long id) {
-		return commentRepository.findByAll(id);
+		return commentRepository.findByAllComments(id);
+	}
+	
+	public Comment findByComment(Long id) {
+		return commentRepository.findByComment(id).get();
+	}
+	
+	public void modify(Long id, String body) {
+		commentRepository.update(id, body);
+	}
+	
+	public void delete(Long id) {
+		commentRepository.delete(id);
+	}
+	
+	public void updateLike(Long id) {
+		commentRepository.updateLikeCount(id);
 	}
 }
