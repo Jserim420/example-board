@@ -144,7 +144,7 @@ public class BoardController {
 		return "redirect:/board?boardNo=" + id;
 	}
 	
-	@GetMapping("/board/keyword")
+	@GetMapping("/board/search")
 	public String search(@CookieValue(name="userId",  required = false) Long userId,
 			Model model,
 			@RequestParam(name="selected") String selected,

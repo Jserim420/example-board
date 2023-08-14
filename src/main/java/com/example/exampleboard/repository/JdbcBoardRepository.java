@@ -26,18 +26,24 @@ public class JdbcBoardRepository {
 	}
 	
 	public Board save(Board board) {
-		SimpleJdbcInsert jdbcInsert = new SimpleJdbcInsert(jdbcTemplate);
-		jdbcInsert.withTableName("TB_board").usingGeneratedKeyColumns("id");
-		Map<String,  Object> parameters = new HashMap<>();
-		parameters.put("title", board.getTitle());
-		parameters.put("body", board.getBody());
-		parameters.put("writeDate", board.getWriteDate());
-		parameters.put("userId", board.getUserId());
-		parameters.put("viewCount", board.getViewCount());
-		parameters.put("likeCount", board.getLikeCount());
+//		SimpleJdbcInsert jdbcInsert = new SimpleJdbcInsert(jdbcTemplate);
+//		jdbcInsert.withTableName("TB_board").usingGeneratedKeyColumns("id");
+//		Map<String,  Object> parameters = new HashMap<>();
+//		parameters.put("title", board.getTitle());
+//		parameters.put("body", board.getBody());
+//		parameters.put("writeDate", board.getWriteDate());
+//		parameters.put("userId", board.getUserId());
+//		parameters.put("viewCount", board.getViewCount());
+//		parameters.put("likeCount", board.getLikeCount());
+//		
+//		Number key = jdbcInsert.executeAndReturnKey(new MapSqlParameterSource(parameters)); //PK값 얻기
+//		board.setId(key.longValue());
+//		return board;
 		
-		Number key = jdbcInsert.executeAndReturnKey(new MapSqlParameterSource(parameters)); //PK값 얻기
-		board.setId(key.longValue());
+		jdbcTemplate.update("insert into TB_board(title, body, writeDate, userId, viewCount, likeCount) "
+				+ "values(?, ?, ?, ?, ?, ?)", 
+				board.getTitle(),board.getBody(), board.getWriteDate(), board.getUserId(), board.getViewCount(), board.getLikeCount());
+		
 		return board;
 	}
 	

@@ -8,6 +8,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.unbescape.css.CssIdentifierEscapeLevel;
 
 import com.example.exampleboard.AlertMessage;
 import com.example.exampleboard.model.User;
@@ -63,8 +64,9 @@ public class UserController {
 		else if(form.getPassword().equals("")) AlertMessage.alertAndBack(response, "비밀번호를 입력해주세요.");
 		else if(!form.getPassword().equals(form.getPasswordConfirm())) AlertMessage.alertAndBack(response, "비밀번호가 일치하지 않습니다.");
 		else {
-			if(userService.join(user)!=null) AlertMessage.alertAndMove(response, "회원가입에 성공했습니다.", "/login");
-			else AlertMessage.alertAndBack(response, "이미 존재하는 아이디 입니다.");
+			if(userService.isName(user)==true) AlertMessage.alertAndBack(response, "이미 존재하는 닉네임입니다.");
+			else if(userService.isUser(user)==true) AlertMessage.alertAndBack(response, "이미 가입된 이메일입니다.");
+			else AlertMessage.alertAndMove(response, "회원가입에 성공했습니다.", "/login"); 
 		}
 	}
 	

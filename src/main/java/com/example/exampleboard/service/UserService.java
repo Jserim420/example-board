@@ -18,16 +18,21 @@ public class UserService {
 	}
 	
 	public Long join(User user) {
-		if(isUser(user)) return null;
-		else {
+		if(!isUser(user) && !isName(user)) { // 가입된 사용자가 없다면
 			userRepository.save(user);
-			return user.getId();
+			return null;
 		}
+			return user.getId();
 	}
 	
 	public Boolean isUser(User user) {
 		
 		if(!userRepository.findByEmail(user.getEmail()).isPresent()) return false;
+		else return true;
+	}
+	
+	public Boolean isName(User user) {
+		if(!userRepository.findByName(user.getName()).isPresent()) return false;
 		else return true;
 	}
 	

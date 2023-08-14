@@ -27,16 +27,19 @@ public class JdbcUserRepository implements UserRepository{
 	
 	@Override
 	public User save(User user) {
-		SimpleJdbcInsert jdbcInsert = new SimpleJdbcInsert(jdbcTemplate);
-		jdbcInsert.withTableName("TB_user").usingGeneratedKeyColumns("id");
-		Map<String,  Object> parameters = new HashMap<>();
-		parameters.put("email", user.getEmail());
+//		SimpleJdbcInsert jdbcInsert = new SimpleJdbcInsert(jdbcTemplate);
+//		jdbcInsert.withTableName("TB_user").usingGeneratedKeyColumns("id");
+//		Map<String,  Object> parameters = new HashMap<>();
+//		parameters.put("email", user.getEmail());
 		String encodePassword = encoder.encode(user.getPassword());
-		parameters.put("password", encodePassword);
-		parameters.put("name", user.getName());
+//		parameters.put("password", encodePassword);
+//		parameters.put("name", user.getName());
+//		
+//		Number key = jdbcInsert.executeAndReturnKey(new MapSqlParameterSource(parameters)); //PK값 얻기
+//		user.setId(key.longValue());
+		jdbcTemplate.update("insert into TB_user(email, password, name) values(?, ?, ?)",
+				user.getEmail(), encodePassword, user.getName());
 		
-		Number key = jdbcInsert.executeAndReturnKey(new MapSqlParameterSource(parameters)); //PK값 얻기
-		user.setId(key.longValue());
 		return user;
 	}
 
@@ -51,6 +54,12 @@ public class JdbcUserRepository implements UserRepository{
 	@Override
 	public Optional<User> findByEmail(String email) {
 		List<User> result = jdbcTemplate.query("select * from TB_user where email = ?", userRowMapper(), email);
+		return result.stream().findAny();
+	}
+	
+	@Override
+	public Optional<User> findByName(String name) {
+		List<User> result = jdbcTemplate.query("select * from TB_user where name = ?", userRowMapper(), name);
 		return result.stream().findAny();
 	}
 	

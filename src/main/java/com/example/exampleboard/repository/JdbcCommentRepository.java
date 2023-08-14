@@ -24,19 +24,22 @@ public class JdbcCommentRepository {
 	}
 	
 	public Comment save(Comment comment) {
-		SimpleJdbcInsert jdbcInsert = new SimpleJdbcInsert(jdbcTemplate);
-		jdbcInsert.withTableName("TB_comment").usingGeneratedKeyColumns("id");
-		Map<String, Object> parameters = new HashMap<>();
-		parameters.put("id", comment.getId());
-		parameters.put("body", comment.getBody());
-		parameters.put("boardID", comment.getBoardId());
-		parameters.put("userName", comment.getUserName());
-		parameters.put("password", comment.getPassword());
-		parameters.put("writeDate", comment.getWriteDate());
-		parameters.put("likeCount", comment.getLikeCount());		
-	
-		Number key = jdbcInsert.executeAndReturnKey(new MapSqlParameterSource(parameters));
-		comment.setId(key.longValue());
+//		SimpleJdbcInsert jdbcInsert = new SimpleJdbcInsert(jdbcTemplate);
+//		jdbcInsert.withTableName("TB_comment").usingGeneratedKeyColumns("id");
+//		Map<String, Object> parameters = new HashMap<>();
+//		parameters.put("id", comment.getId());
+//		parameters.put("body", comment.getBody());
+//		parameters.put("boardID", comment.getBoardId());
+//		parameters.put("userName", comment.getUserName());
+//		parameters.put("password", comment.getPassword());
+//		parameters.put("writeDate", comment.getWriteDate());
+//		parameters.put("likeCount", comment.getLikeCount());		
+//	
+//		Number key = jdbcInsert.executeAndReturnKey(new MapSqlParameterSource(parameters));
+//		comment.setId(key.longValue());
+		
+		jdbcTemplate.update("insert into TB_comment(body, boardId, writeDate, likeCount, userName, password)"
+				+ "values(?, ?, ?, ?, ?, ?)", comment.getBody(), comment.getBoardId(), comment.getWriteDate(), comment.getLikeCount(), comment.getUserName(), comment.getPassword() ); 
 		return comment;
 	}
 	

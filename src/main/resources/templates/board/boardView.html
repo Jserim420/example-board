@@ -52,14 +52,12 @@
     	</div>
     </div>
 	
-	<div class="accordion" id="accordionExample">
-	  <div class="accordion-item">
-	    <h2 class="accordion-header">
-	      <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
-	        댓글
-	      </button>
-	     </h2>
-	  <div id="collapseOne" class="accordion-collapse collapse show" data-bs-parent="#accordionExample">
+	
+	<div style="margin-bottom: 100px;">
+	<div class="card">
+		<h5 style="margin: 10px;">댓글</h5>
+	</div>
+	     
 	  <div th:if="${comments}!=null" th:each="comment : ${comments}" style="margin: 15px;">
 		  <div><p th:text="${comment.userName}" style="font-weight: bold; float:right;">작성자</p>
 		  <div><p th:text="${comment.body}" style="margin-left:10px;  margin-right:65px;">내용</p></div>
@@ -76,11 +74,9 @@
 		  </div>
 		  </div>
 		  <hr>
-		</div>
 	</div>
 	</div>
-	</div>
-     
+	
     <div class="card mt-3">
   	<div class="card-body">
     <form th:action="@{|/api/comment/write?boardNo=${board.id}|}" method="post">
@@ -102,9 +98,10 @@
 	</form>  
 	</div>
 	</div> 
+	
+	</div>
+	</div>
  
-  </div> 
-  </div>
  	
  	<script th:inline="javascript">
  	function deleteBoard(id) {
@@ -143,6 +140,6 @@
  	}
  	
  	</script>
- 	</div>
   </th:block>
+  </div>
   </html>
