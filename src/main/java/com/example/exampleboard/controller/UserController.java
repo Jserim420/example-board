@@ -66,7 +66,10 @@ public class UserController {
 		else {
 			if(userService.isName(user)==true) AlertMessage.alertAndBack(response, "이미 존재하는 닉네임입니다.");
 			else if(userService.isUser(user)==true) AlertMessage.alertAndBack(response, "이미 가입된 이메일입니다.");
-			else AlertMessage.alertAndMove(response, "회원가입에 성공했습니다.", "/login"); 
+			else {
+				userService.join(user);
+				AlertMessage.alertAndMove(response, "회원가입에 성공했습니다.", "/login"); 
+			}
 		}
 	}
 	
@@ -78,7 +81,6 @@ public class UserController {
 		user.setPassword(form.getPassword());
 		
 		User loginUser = userService.checkUser(user);
-		Long loginId = userRepository.findByEmail(user.getEmail()).get().getId();
 		// System.out.println(form.getEmail() + "," + form.getPassword());
 		// 아이디 비밀번호 미입력
 		if(user.getEmail().equals("")) AlertMessage.alertAndBack(response, "아이디를 입력하세요.");
@@ -88,6 +90,7 @@ public class UserController {
 		
 		else {
 			//로그인 성공
+			Long loginId = userRepository.findByEmail(user.getEmail()).get().getId();
 			System.out.println("로그인유저" + loginUser.getId());
 			Cookie cookie = new Cookie("userId", String.valueOf(loginId));
 			cookie.setMaxAge(30 * 60);

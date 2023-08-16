@@ -118,9 +118,9 @@
  	};
  	
  	function modifyComment(comment) {
- 		pwConfirm = prompt('비밀번호 확인');
+ 		pwConfirm = prompt('댓글 작성시 등록한 비밀번호를 입력해주세요.');
  		if(pwConfirm==comment.password) {
- 			updateBody = prompt('수정내용', comment.body);
+ 			updateBody = prompt('수정할 내용을 입력해주세요.', comment.body);
  			window.location.href = '/comment/modify?commentNo=' + comment.id + "&body=" + updateBody;
  		}
  		else if (pwConfirm=="") alert("비밀번호를 입력해주세요.");
@@ -130,7 +130,7 @@
  	
  	function deleteComment(comment) {
  		if(confirm("삭제하시겠습니까?")==true) {
-	 		pwConfirm = prompt('비밀번호 확인');
+	 		pwConfirm = prompt('댓글 작성시 등록한 비밀번호를 입력해주세요.');
 	 		if(pwConfirm==comment.password) 
 	 			window.location.href = '/comment/delete?commentNo=' + comment.id;
 	 		else if(pwConfirm=="") alert("비밀번호를 입력해주세요.");

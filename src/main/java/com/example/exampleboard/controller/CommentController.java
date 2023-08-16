@@ -42,10 +42,10 @@ public class CommentController {
 		comment.setWriteDate(new Date());
 		
 		if(commentForm.getBody()=="")
-			AlertMessage.alertAndMove(response, "댓글을 작성해주세요.","/board?boardNo=" + boardId);
-		if(commentForm.getName()=="")
+			AlertMessage.alertAndMove(response, "내용을 작성해주세요.","/board?boardNo=" + boardId);
+		else if(commentForm.getName()=="")
 			AlertMessage.alertAndMove(response, "작성자 닉네임을 입력해주세요.", "/board?boardNo=" + boardId);
-		if(commentForm.getPassword()=="")
+		else if(commentForm.getPassword()=="")
 			AlertMessage.alertAndMove(response, "비밀번호를 입력해주세요.", "/board?boardNo=" + boardId);
 		else {
 			commentService.write(comment);
