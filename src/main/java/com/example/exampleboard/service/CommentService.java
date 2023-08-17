@@ -2,12 +2,16 @@ package com.example.exampleboard.service;
 
 import java.util.List;
 
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+
 import com.example.exampleboard.model.Comment;
 import com.example.exampleboard.repository.JdbcCommentRepository;
 
 public class CommentService {
 	
 	private JdbcCommentRepository commentRepository;
+	BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
+	
 	
 	public CommentService(JdbcCommentRepository commentRepository) {
 		this.commentRepository = commentRepository;
@@ -35,5 +39,9 @@ public class CommentService {
 	
 	public void updateLike(Long id) {
 		commentRepository.updateLikeCount(id);
+	}
+	
+	public boolean checkPassword(Long id, String password) {
+		return encoder.matches(password, findByComment(id).getPassword());
 	}
 }

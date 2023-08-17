@@ -11,6 +11,7 @@
 		    <select id="selected" name="selected" class="form-select">
 		      <option selected>제목</option>
 		      <option>내용</option>
+		      <option>작성자</option>
 		    </select>
 		    </div>
       		<div class="col-6">
@@ -21,6 +22,7 @@
     	</div>
     	</form>
 		
+		<h3 th:if="${keyword}!=null" th:text="${selected} + ' [ ' + ${keyword} +' ]' + ' 의 검색결과'" style="text-align: center;"></h3>
 		<table class="table table-hover" style="text-align: center;">
 		  <thead class="table-light">
 		    <tr>

@@ -19,7 +19,7 @@ public class BoardService {
 	}
 
 	public void write(Board board) {
-		boardRepository.save(board);
+		boardRepository.save(board); 
 	}
 	
 	public List<Board> findAllBoards() {

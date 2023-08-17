@@ -10,7 +10,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.example.exampleboard.model.User;
-import com.example.exampleboard.repository.UserRepository;
+import com.example.exampleboard.repository.JdbcUserRepository;
 import com.example.exampleboard.service.UserService;
 
 @SpringBootTest
@@ -18,7 +18,7 @@ import com.example.exampleboard.service.UserService;
 public class UserServiceIntegratedTest {
 	
 	@Autowired UserService userService;
-	@Autowired UserRepository userRepository;
+	@Autowired JdbcUserRepository JdbcUserRepository;
 
 
 	@Test
@@ -34,7 +34,7 @@ public class UserServiceIntegratedTest {
 		Long saveId = userService.join(user);
 		
 		//Then
-		User findUser = userRepository.findById(saveId).get();
+		User findUser = JdbcUserRepository.findById(saveId).get();
 		assertEquals(user.getEmail(), findUser.getEmail());
 	}
 

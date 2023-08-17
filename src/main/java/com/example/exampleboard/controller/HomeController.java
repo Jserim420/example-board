@@ -13,24 +13,23 @@ import com.example.exampleboard.model.Board;
 import com.example.exampleboard.model.PageDto;
 import com.example.exampleboard.model.Pagination;
 import com.example.exampleboard.model.User;
-import com.example.exampleboard.repository.UserRepository;
+import com.example.exampleboard.repository.JdbcUserRepository;
 import com.example.exampleboard.service.BoardService;
 import com.example.exampleboard.service.UserService;
 
 @Controller
 public class HomeController {
 	
-	private final UserRepository userRepository;
-	private final UserService userService;
+	private final JdbcUserRepository jdbcUserRepository;
 	private final BoardService boardService;
 	
 	@Autowired
-	public HomeController(UserRepository userRepository, UserService userService, BoardService boardService) {
-		this.userRepository=userRepository;
-		this.userService = userService;
+	public HomeController(JdbcUserRepository jdbcUserRepository, BoardService boardService) {
+		this.jdbcUserRepository=jdbcUserRepository;
 		this.boardService = boardService;
 	}
 	
+	// WelcomePage
 	@GetMapping("/")
 	public String boardList(@CookieValue(name = "userId", required = false) Long userId, Model model,
 	                        @RequestParam(defaultValue = "1") int pageNum,
@@ -38,17 +37,19 @@ public class HomeController {
 	    System.out.println(userId);
 	    
 	    if (userId != null) {
-	        User loginUser = userRepository.findById(userId).orElse(null);
+	        User loginUser = jdbcUserRepository.findById(userId).orElse(null);
 	        model.addAttribute("user", loginUser);
 	    } else {
 	        model.addAttribute("user", null);
 	    }
 
+	    // 전체 게시글 사이즈 확인
 	    int totalData = boardService.findAllBoards().size(); 
-	    System.out.println("사이즈 : " + totalData);
+//	    System.out.println("사이즈 : " + totalData);
+	    // (default 페이지 번호는 1쪽, 사이즈는 10개 => 한페이지당 10개의 게시글)
 	    Pagination pagination = new Pagination(pageNum, pageSize);
 	    
-	    System.out.println("페이지 당 글 개수 : " + pagination.getAmount());
+//	    System.out.println("페이지 당 글 개수 : " + pagination.getAmount());
 	    List<Board> boards = boardService.findBoardPage(pageNum, pagination.getAmount());
 	    
 	    PageDto pageDto = new PageDto(pagination, totalData);

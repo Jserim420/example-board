@@ -18,11 +18,19 @@ public class AlertMessage {
 	        out.flush();
 	    }
 	 
+	    public static void alertAndClose(HttpServletResponse response, String alertText)
+	            throws IOException {
+	        init(response);
+	        PrintWriter out = response.getWriter();
+	        out.println("<script>alert('" + alertText + "'); opener.parent.location.reload(); window.close();</script> ");
+	        out.flush();
+	    }
+	    
 	    public static void alertAndMove(HttpServletResponse response, String alertText, String nextPage)
 	            throws IOException {
 	        init(response);
 	        PrintWriter out = response.getWriter();
-	        out.println("<script>alert('" + alertText + "'); location.href='" + nextPage + "';</script> ");
+	        out.println("<script>alert('" + alertText + "');  location.href='" + nextPage + "';</script> ");
 	        out.flush();
 	    }
 	 

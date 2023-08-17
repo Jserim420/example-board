@@ -8,7 +8,6 @@ import org.springframework.context.annotation.Configuration;
 import com.example.exampleboard.repository.JdbcBoardRepository;
 import com.example.exampleboard.repository.JdbcCommentRepository;
 import com.example.exampleboard.repository.JdbcUserRepository;
-import com.example.exampleboard.repository.UserRepository;
 import com.example.exampleboard.service.BoardService;
 import com.example.exampleboard.service.CommentService;
 import com.example.exampleboard.service.UserService;
@@ -25,7 +24,7 @@ public class SpringConfig {
 	
 	@Bean
 	public UserService userService() {
-		return new UserService(userRepository());
+		return new UserService(jdbcUserRepository());
 	}
 	
 	@Bean
@@ -35,12 +34,12 @@ public class SpringConfig {
 	
 	@Bean
 	public JdbcBoardRepository jdbcBoardRepository() {
-		return new JdbcBoardRepository(dataSource, userRepository());
+		return new JdbcBoardRepository(dataSource, jdbcUserRepository());
 	}
 	
+	
 	@Bean
-	public UserRepository userRepository() {
-		//return new MemoryUserRepository();
+	public JdbcUserRepository jdbcUserRepository() {
 		return new JdbcUserRepository(dataSource);
 	}
 	
