@@ -2,6 +2,9 @@ package com.example.exampleboard.service;
 
 
 
+import java.util.List;
+import java.util.Optional;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.transaction.annotation.Transactional;
@@ -54,6 +57,11 @@ public class UserService {
 			if(userRepository.findByEmail(user.getEmail()).isEmpty()) return false;
 			else return encoder.matches(user.getPassword(), 
 					userRepository.findByEmail(user.getEmail()).get().getPassword());
+		}
+		
+	// 닉네임 포함 유무 체크
+		public Optional<User> searchName(String name) {
+			return userRepository.findByNameContaining(name).stream().findAny();
 		}
 }
 	

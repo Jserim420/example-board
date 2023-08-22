@@ -14,6 +14,7 @@ import com.example.exampleboard.model.Board;
 import com.example.exampleboard.model.Comment;
 import com.example.exampleboard.service.CommentService;
 
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
 @Controller
@@ -76,15 +77,15 @@ public class CommentController {
 	}
 	
 	// 댓글 좋아요
-//	@GetMapping("/api/comment/like")
-//	public String like(@RequestParam(name="commentNo") Long id,
-//			HttpServletResponse response) {
-//		commentService.updateLike(id);
-//		
-//		Long boardId = commentService.findByComment(id).getBoardId();
-//		
-//		return "redirect:/board?boardNo=" + boardId;
-//	}
+	@GetMapping("/api/comment/like")
+	public String like(@RequestParam(name="commentNo") Long commentId,
+			HttpServletResponse response, HttpServletRequest request) throws Exception {
+		 
+		commentService.updateLikeCount(commentId, request, response);
+		
+		Long boardId = commentService.findByComment(commentId).getBoardId();
+		return "redirect:/board?boardNo=" + boardId;
+	}
 	
 	@GetMapping("/comment/userConfirm")
 	public String confirm(@RequestParam(name="commentNo") Long id, Model model) {

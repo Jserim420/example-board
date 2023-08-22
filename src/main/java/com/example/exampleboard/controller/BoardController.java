@@ -2,12 +2,15 @@ package com.example.exampleboard.controller;
 
 
 
-import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.CookieValue;
@@ -89,7 +92,7 @@ public class BoardController {
 	@GetMapping("/board")
 	public String boardView(@RequestParam(name = "boardNo") Long id, 
 			@CookieValue(name = "userId", required = false) Long userId, 
-			Model model, HttpServletResponse response, HttpServletRequest request) {
+			Model model, HttpServletResponse response, HttpServletRequest request) throws Exception {
 		if (userId != null) { // 로그인한 사용자가 게시글 작성자인지 확인하기 위해  model 에 값 전달
 			User loginUser = userService.findUser(userId);
 			model.addAttribute("user", loginUser);
@@ -98,7 +101,7 @@ public class BoardController {
 		
 		System.out.println("test");
 		// 조회수 증가
-		boardService.updateViewCount(id, request, response);
+		boardService.updateCount(id, request, response, "view");
 		System.out.println("test2");
 		// 게시글 찾기
 		Board findBoards = boardService.findBoard(id);
@@ -133,76 +136,83 @@ public class BoardController {
 
 	// 게시글 수정 로직
 	@PostMapping("/api/board/update")
-	public String update(@RequestParam(name="boardNo") Long id, Board board, BoardForm boardForm, HttpServletResponse response) throws Exception {
-		Board updateBoard = new Board();
-		updateBoard.setTitle(boardForm.getTitle());
-		updateBoard.setBody(boardForm.getBody());
-		
-		// 제목, 내용을 입력하지 않았을 때
-		if(boardForm.getTitle().equals("")) AlertMessage.alertAndBack(response, "제목을 입력해주세요.");
-		else if(boardForm.getBody().equals("")) AlertMessage.alertAndBack(response, "내용을 입력해주세요.");
+	public String update(@RequestParam(name="boardNo") Long boardId, Board board, BoardForm boardForm, 
+			HttpServletResponse response, @CookieValue(name="userId", required = false) Long userId) throws Exception {
+		if(userId!=boardService.findBoard(boardId).getUserId()) AlertMessage.alertAndBack(response, "게시글 수정은 게시글 작성자만 할 수 있습니다.");
 		else {
-
-			boardService.update(updateBoard, id);
-			AlertMessage.alertAndMove(response, "글이 성공적으로 수정되었습니다.", "/");
+			Board updateBoard = new Board();
+			updateBoard.setTitle(boardForm.getTitle());
+			updateBoard.setBody(boardForm.getBody());
+			
+			// 제목, 내용을 입력하지 않았을 때
+			if(boardForm.getTitle().equals("")) AlertMessage.alertAndBack(response, "제목을 입력해주세요.");
+			else if(boardForm.getBody().equals("")) AlertMessage.alertAndBack(response, "내용을 입력해주세요.");
+			else {
+				boardService.update(updateBoard, boardId);
+				AlertMessage.alertAndMove(response, "글이 성공적으로 수정되었습니다.", "/board?boardNo=" + boardId);
+			}
 		}
-		return "redirect:/board?boardNo=" + id;
+		return "redirect:/board?boardNo=" + boardId;
 	}
 	
 //	
 //	
 	// 게시글 삭제
 	@GetMapping("/board/delete")
-	public String delete(@RequestParam(name="boardNo") Long id) {
-		boardService.delete(id);
+	public String delete(@RequestParam(name="boardNo") Long boardId, @CookieValue(name="userId", required = false) Long userId,
+			HttpServletResponse response) throws Exception {
+		if(userId!=boardService.findBoard(boardId).getUserId()) AlertMessage.alertAndBack(response, "게시글 삭제는 게시글 작성자만 할 수 있습니다.");
+		else boardService.delete(boardId);
 		
 		return "redirect:/";
 	}
+	
+	// 게시글 좋아요
+	@GetMapping("/api/board/like")
+	public String updateLike(@RequestParam(name="boardNo") Long boardId, Board board, BoardForm boardForm, 
+			@CookieValue(name="userId", required = false) Long userId,
+			HttpServletResponse response, HttpServletRequest request) throws Exception {
+		System.out.println("좋아요");
+		if(userId==boardService.findBoard(boardId).getUserId()) AlertMessage.alertAndBack(response, "내 글에는 좋아요를 누를 수 없습니다.");
+		else boardService.updateCount(boardId, request, response, "like");
+		return "redirect:/board?boardNo=" + boardId;
+	}
+	
 //	
 	
 //	
-//	
-//	// 게시글 좋아요
-//	@GetMapping("/api/board/like")
-//	public String updateLike(@RequestParam(name="boardNo") Long id, Board board, BoardForm boardForm, HttpServletResponse response) throws Exception {
-//		boardService.updateLikeCount(id);
-//		return "redirect:/board?boardNo=" + id;
-//	}
-//	
-//	// 게시글 검색
-//	@GetMapping("/board/search")
-//	public String search(@CookieValue(name="userId",  required = false) Long userId,
-//			Model model,
-//			@RequestParam(name="selected") String selected,
-//			@RequestParam(name="keyword") String keyword,
-//			@RequestParam(name="pageNum", defaultValue = "1") int pageNum,
-//			@RequestParam(defaultValue = "10") int pageSize,
-//			HttpServletResponse response) throws Exception {
-//		
-//		 if (userId != null) {
-//		        User loginUser = jdbcUserRepository.findById(userId).orElse(null);
-//		        model.addAttribute("user", loginUser);
-//		    } else {
-//		        model.addAttribute("user", null);
-//		    }
-//		 
-//		 // 검색어를 입력하지 않았을 때
-//		 if(keyword.equals("")) AlertMessage.alertAndBack(response, "검색어를 입력해주세요.");
-//		 else { // 검색어를 입력했을때
-//		    int totalData = boardService.keywordSize(selected, keyword);
-////		    System.out.println("사이즈 : " + totalData);
-//		    Pagination pagination = new Pagination(pageNum, pageSize);
-//		    
-////		    System.out.println("페이지 당 글 개수 : " + pagination.getAmount());
-//		    List<Board> boards = boardService.findKeywordPage(selected, keyword, pageNum, pagination.getAmount());
-//		    
-//		    PageDto pageDto = new PageDto(pagination, totalData);
-//		    model.addAttribute("pageDto", pageDto);
-////		    System.out.println(pageDto.toString());
-//		    model.addAttribute("boards",boards);
-//		    model.addAttribute("keyword", keyword);
-//		    model.addAttribute("selected", selected);
-//		 }
-//		    return "board/boardList";
-//	}
+	// 게시글 검색
+	@GetMapping("/board/search")
+	public String search(@CookieValue(name="userId",  required = false) Long userId,
+			Model model,
+			@RequestParam(name="selected") String selected,
+			@RequestParam(name="keyword") String keyword,
+			@PageableDefault(page=0, size=10, sort="writeDate", direction = Sort.Direction.DESC) Pageable pageable,
+			HttpServletResponse response) throws Exception {
+		if(keyword.equals("")) AlertMessage.alertAndBack(response, "검색어를 입력해주세요.");
+		else if(selected.equals("")) AlertMessage.alertAndBack(response, "검색범위를 설정해주세요");
+		else {	
+		    model.addAttribute("keyword", keyword);
+		    model.addAttribute("selected", selected);
+		    
+			if(selected.equals("작성자")) {
+				if(userService.searchName(keyword).isPresent()) 
+					keyword=Long.toString(userService.searchName(keyword).get().getId());
+				else { 
+					model.addAttribute("boards", null);
+					return "board/boardList";
+				}
+			} 
+				Page<Board> searchList = boardService.search(selected, keyword, pageable);
+				
+			    System.out.println("총 element 수 :" +  searchList.getTotalElements() + " 전체 page 수 : " + searchList.getTotalPages()
+				+ " 페이지에 표시할 element 수 : " + searchList.getSize() + " 현재 페이지 index : " +  searchList.getNumber() 
+				+ " 현재 페이지의 element 수 : " + searchList.getNumberOfElements());
+			    if(searchList.getTotalElements()<1 | searchList==null) model.addAttribute("boards", null);
+			    else model.addAttribute("boards", searchList);
+		}
+		    
+			return "board/boardList";
+	}
+	
 }
