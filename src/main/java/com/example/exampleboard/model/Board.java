@@ -1,15 +1,29 @@
 package com.example.exampleboard.model;
 
-import java.util.Date;
 
+import org.hibernate.annotations.DynamicUpdate;
+
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
+
+@Entity
+@DynamicUpdate
+@Table(name="TB_BOARD")
 public class Board {
+	
+	@Id @GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
 	private String title;
 	private String body;
-	private Date writeDate;
+	private String writeDate;
 	private Long userId;
 	private int viewCount;
 	private int likeCount;
+	
+	
 	public Long getId() {
 		return id;
 	}
@@ -28,10 +42,10 @@ public class Board {
 	public void setBody(String body) {
 		this.body = body;
 	}
-	public Date getWriteDate() {
+	public String getWriteDate() {
 		return writeDate;
 	}
-	public void setWriteDate(Date date) {
+	public void setWriteDate(String date) {
 		this.writeDate = date;
 	}
 	public Long getUserId() {

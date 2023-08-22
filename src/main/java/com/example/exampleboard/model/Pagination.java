@@ -1,6 +1,5 @@
 package com.example.exampleboard.model;
 
-import org.springframework.web.util.UriComponentsBuilder;
 
 public class Pagination {
 	private int pageNum;

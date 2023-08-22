@@ -16,10 +16,9 @@ import jakarta.servlet.DispatcherType;
 @EnableWebSecurity
 public class SecurityConfig {
 	
-	 
 
     @Bean
-    public PasswordEncoder passwordEncoder(){
+    public BCryptPasswordEncoder encoder(){
         return new BCryptPasswordEncoder();
     }
 	

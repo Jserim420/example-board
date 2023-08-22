@@ -1,9 +1,5 @@
 package com.example.exampleboard.controller;
 
-
-
-
-
 import java.util.Date;
 
 import org.springframework.stereotype.Controller;
@@ -80,15 +76,15 @@ public class CommentController {
 	}
 	
 	// 댓글 좋아요
-	@GetMapping("/api/comment/like")
-	public String like(@RequestParam(name="commentNo") Long id,
-			HttpServletResponse response) {
-		commentService.updateLike(id);
-		
-		Long boardId = commentService.findByComment(id).getBoardId();
-		
-		return "redirect:/board?boardNo=" + boardId;
-	}
+//	@GetMapping("/api/comment/like")
+//	public String like(@RequestParam(name="commentNo") Long id,
+//			HttpServletResponse response) {
+//		commentService.updateLike(id);
+//		
+//		Long boardId = commentService.findByComment(id).getBoardId();
+//		
+//		return "redirect:/board?boardNo=" + boardId;
+//	}
 	
 	@GetMapping("/comment/userConfirm")
 	public String confirm(@RequestParam(name="commentNo") Long id, Model model) {

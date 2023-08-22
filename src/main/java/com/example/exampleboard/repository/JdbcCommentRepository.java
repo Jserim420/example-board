@@ -6,6 +6,7 @@ import java.util.Optional;
 
 import javax.sql.DataSource;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -15,6 +16,7 @@ import com.example.exampleboard.model.Comment;
 
 public class JdbcCommentRepository {
 	private final JdbcTemplate jdbcTemplate;
+	@Autowired
 	BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
 	
 	public JdbcCommentRepository(DataSource dataSource) {

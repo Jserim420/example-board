@@ -6,16 +6,17 @@ import java.util.Optional;
 
 import javax.sql.DataSource;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+//import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 import com.example.exampleboard.model.User;
 
 public class JdbcUserRepository{
 
 	private final JdbcTemplate jdbcTemplate;
-	BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
+	
 	
 	
 	public JdbcUserRepository(DataSource dataSource) {
@@ -29,14 +30,14 @@ public class JdbcUserRepository{
 //		jdbcInsert.withTableName("TB_user").usingGeneratedKeyColumns("id");
 //		Map<String,  Object> parameters = new HashMap<>();
 //		parameters.put("email", user.getEmail());
-		String encodePassword = encoder.encode(user.getPassword());
+//		String encodePassword = encoder.encode(user.getPassword());
 //		parameters.put("password", encodePassword);
 //		parameters.put("name", user.getName());
 //		
 //		Number key = jdbcInsert.executeAndReturnKey(new MapSqlParameterSource(parameters)); //PK값 얻기
 //		user.setId(key.longValue());
-		jdbcTemplate.update("insert into TB_user(email, password, name) values(?, ?, ?)",
-				user.getEmail(), encodePassword, user.getName());
+//		jdbcTemplate.update("insert into TB_user(email, password, name) values(?, ?, ?)",
+//				user.getEmail(), encodePassword, user.getName());
 		
 		return user;
 	}
@@ -81,7 +82,7 @@ public class JdbcUserRepository{
 		String userPassword = findUser.getPassword();
 		System.out.println(userPassword);
 		System.out.println(user.getPassword());
-		return encoder.matches(user.getPassword(), userPassword);
+		return false;
 	}
 
 

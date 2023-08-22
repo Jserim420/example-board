@@ -2,52 +2,58 @@ package com.example.exampleboard.service;
 
 
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.example.exampleboard.model.User;
-import com.example.exampleboard.repository.JdbcUserRepository;
-import com.fasterxml.jackson.databind.node.BooleanNode;
+import com.example.exampleboard.repository.JpaUserRepository;
 
 @Transactional
 public class UserService {
 	
-	private final JdbcUserRepository jdbcUserRepository;
+	private final JpaUserRepository userRepository;
+	private final BCryptPasswordEncoder encoder;
 
-	public UserService(JdbcUserRepository jdbcUserRepository) {
-		this.jdbcUserRepository=jdbcUserRepository;
+	@Autowired
+	public UserService(JpaUserRepository userRepository, BCryptPasswordEncoder encoder) {
+		this.userRepository = userRepository;
+		this.encoder = encoder;
 	}
 	
+	// 회원가입
 	public Long join(User user) {
-		if(!isUser(user) && !isName(user)) { // 가입된 사용자가 없다면
-			jdbcUserRepository.save(user);
+		if(isName(user)!=null && isEmail(user)!=null) {
+			user.setPassword(encoder.encode(user.getPassword()));
+			userRepository.save(user);
 			return null;
+		} else return user.getId();
+	}
+	
+	//회원찾기
+	public User findUser(Long id) {
+		return userRepository.findById(id).get();
+	}
+	
+	// 이메일중복체크
+	public User isEmail(User user) {
+		if(userRepository.findByEmail(user.getEmail()).isPresent()) 
+			return userRepository.findByEmail(user.getEmail()).get();
+		else return null;
+	}
+	
+	
+	// 닉네임중복체크
+	public User isName(User user) {
+		if(userRepository.findByName(user.getName()).isPresent()) return user;
+		else return null;
+	}
+	
+	// 아이디&비밀번호 체크
+		public boolean checkUser(User user) {
+			if(userRepository.findByEmail(user.getEmail()).isEmpty()) return false;
+			else return encoder.matches(user.getPassword(), 
+					userRepository.findByEmail(user.getEmail()).get().getPassword());
 		}
-			return user.getId();
-	}
-	
-	public Boolean isUser(User user) {
-		// 가입된 메일이 없다면
-		if(!jdbcUserRepository.findByEmail(user.getEmail()).isPresent()) return false;
-		else return true;
-	}
-	
-	public Boolean isName(User user) {
-		// 가입된 닉네임이 없다면
-		if(!jdbcUserRepository.findByName(user.getName()).isPresent()) return false;
-		else return true;
-	}
-	
-	public Long login(User user) {
-		checkUser(user);
-		return user.getId();
-	}
-	
-	public User checkUser(User user) {
-		System.out.println(user.getEmail());
-		if(!isUser(user)) return null ; // 없는 사용자면 null
-		else if(!jdbcUserRepository.check(user)) return null; // 비밀번호 틀릴때
-		else return user; // 로그인 성공
-		
-	}
 }
 	
