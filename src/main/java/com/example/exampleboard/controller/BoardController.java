@@ -199,7 +199,8 @@ public class BoardController {
 				if(userService.searchName(keyword).isPresent()) 
 					keyword=Long.toString(userService.searchName(keyword).get().getId());
 				else { 
-					model.addAttribute("boards", null);
+//					model.addAttribute("boards", null);
+					AlertMessage.alertAndBack(response, "해당 유저는 존재하지 않습니다.");
 					return "board/boardList";
 				}
 			} 
