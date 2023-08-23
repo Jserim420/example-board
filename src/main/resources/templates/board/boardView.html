@@ -57,10 +57,6 @@
 		  	<a class="btn btn-outline-info" th:href="@{|/api/comment/like?commentNo=${comment.id}|}">좋아요</a><a style="margin-left:10px; color:black;" th:text="${comment.likeCount}"></a>
 		  </div>
 		  <div class="col" style="text-align: right; color: red;">
-		  <!--<a th:onClick="modifyComment([[ ${comment} ]])" style="cursor: pointer;"> 수정 </a>
-			  <a  style="cursor: pointer;margin-right:2px; color:black;"> | </a>
-			  <a th:onClick="deleteComment([[ ${comment} ]])" style="cursor: pointer;"> 삭제</a>
-			   -->
 			  <a th:onClick="modifyComment([[ ${comment} ]])" style="cursor: pointer;"> 수정 </a>
 			  <a  style="cursor: pointer;margin-right:2px; color:black;"> | </a>
 			  <a th:onClick="deleteComment([[ ${comment} ]])" style="cursor: pointer;"> 삭제</a>
@@ -111,29 +107,6 @@
  		}
  	};
  	
- 	/*
- 	function modifyComment(comment) {
- 		pwConfirm = prompt('댓글 작성시 등록한 비밀번호를 입력해주세요.');
- 		if(pwConfirm==comment.password) {
- 			updateBody = prompt('수정할 내용을 입력해주세요.', comment.body);
- 			window.location.href = '/comment/modify?commentNo=' + comment.id + "&body=" + updateBody;
- 		}
- 		else if (pwConfirm=="") alert("비밀번호를 입력해주세요.");
- 		else if (pwConfirm==null) return;
- 		else alert("비밀번호가 일치하지 않습니다.");
- 	};
- 	
- 	function deleteComment(comment) {
- 		if(confirm("삭제하시겠습니까?")==true) {
-	 		pwConfirm = prompt('댓글 작성시 등록한 비밀번호를 입력해주세요.');
-	 		if(pwConfirm==comment.password) 
-	 			window.location.href = '/comment/delete?commentNo=' + comment.id;
-	 		else if(pwConfirm=="") alert("비밀번호를 입력해주세요.");
-	 		else if(pwConfirm==null) return;
-	 		else alert("비밀번호가 일치하지 않습니다.");
-	 	} else return;
- 	}
- 	*/
  	
  	function modifyComment(comment) {
  		popOption = "width= 650px. height=550px, top=300px, lef=300px; scrollbars=yes";

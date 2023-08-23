@@ -11,7 +11,7 @@
 
 <body>
 	<div class="container">
-	<form class="justify-content-center" th:action="@{|/api/comment/modify?commentNo=${comment.id}|}" method="post">
+	<form class="justify-content-center" th:action="@{|/api/comment/update?commentNo=${comment.id}|}" method="post">
 		<div>수정 내용을 입력해주세요.</div>
 		<textarea class="form-control mt-3" placeholder="" id="body" name="body" style="height: 300px" th:text="${comment.body}"></textarea>
 		<button class="btn btn-outline-secondary mt-3" type="submit" style="float:right;">확인</button>

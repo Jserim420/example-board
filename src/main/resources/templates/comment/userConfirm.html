@@ -11,13 +11,13 @@
 
 <body>
 	<div class="container">
-	<form th:if="${selected}=='modify'" class="justify-content-center" th:action="@{|/api/comment/userConfirm?commentNo=${commentNo}|}" method="post">
+	<form th:if="${option}=='update'" class="justify-content-center" th:action="@{|/api/comment/userConfirm?commentNo=${commentNo}|}" method="post">
 		<div> 댓글 작성시 등록했던 비밀번호를 입력해주세요.</div>
 		<input type="password" id="password" name="password">
 		<button class="btn btn-outline-secondary" type="submit">확인</button>
 	</form>
 	
-	<form th:if="${selected}=='delete'"  class="justify-content-center" th:action="@{|/api/comment/delete?commentNo=${commentNo}|}" method="post">
+	<form th:if="${option}=='delete'"  class="justify-content-center" th:action="@{|/api/comment/delete?commentNo=${commentNo}|}" method="post">
 		<div> 댓글 작성시 등록했던 비밀번호를 입력해주세요.</div>
 		<input type="password" id="password" name="password">
 		<button class="btn btn-outline-secondary" type="submit">확인</button>

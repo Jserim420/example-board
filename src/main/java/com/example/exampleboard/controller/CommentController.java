@@ -55,26 +55,9 @@ public class CommentController {
 		
 	}
 	
-	// 댓글 수정
-	@PostMapping("/api/comment/modify")
-	public void modify(@RequestParam(name="commentNo") Long id, CommentForm commentForm,
-			HttpServletResponse response) throws Exception {
+
 	
-//		Long boardId = commentService.findByComment(id).getBoardId();
-		
-		commentService.modify(id, commentForm.getBody());
-		AlertMessage.alertAndClose(response, "댓글이 정상적으로 수정되었습니다.");
-		
-	}
 	
-	// 댓글 삭제
-	@PostMapping("/api/comment/delete")
-	public void delete(@RequestParam(name="commentNo") Long id,
-			HttpServletResponse response) throws Exception {
-		
-		commentService.delete(id);
-		AlertMessage.alertAndClose(response, "댓글이 정상적으로 삭제되었습니다.");
-	}
 	
 	// 댓글 좋아요
 	@GetMapping("/api/comment/like")
@@ -87,27 +70,33 @@ public class CommentController {
 		return "redirect:/board?boardNo=" + boardId;
 	}
 	
+	// 댓글 수정-비밀번호 확인
 	@GetMapping("/comment/userConfirm")
 	public String confirm(@RequestParam(name="commentNo") Long id, Model model) {
 	
 		model.addAttribute("commentNo", id);
-		model.addAttribute("selected", "modify");
+		model.addAttribute("option", "modify");
 		return "comment/userConfirm";
 	}
 	
-	@GetMapping("/comment/delete")
-	public String confirmDelete(@RequestParam(name="commentNo") Long id, Model model) {
+	// 댓글 수정 로직
+	@PostMapping("/api/comment/update")
+	public void modify(@RequestParam(name="commentNo") Long id, CommentForm commentForm,
+			HttpServletResponse response) throws Exception {
 	
-		model.addAttribute("commentNo", id);
-		model.addAttribute("selected", "delete");
-		return "comment/userConfirm";
+		if(commentForm.getBody()=="")AlertMessage.alertAndClose(response, "내용을 입력해주세요.");
+		else {
+			commentService.modify(id, commentForm.getBody());
+			AlertMessage.alertAndClose(response, "댓글이 정상적으로 수정되었습니다.");
+		}
+		
 	}
 	
+	// 수정- 비밀번호 확인 로직
 	@PostMapping("/api/comment/userConfirm")
 	public String confirmAPI(@RequestParam(name="commentNo") Long id, Comment comment, CommentForm commentForm,
 			HttpServletResponse response, Model model) throws Exception {
-		comment.setPassword(commentForm.getPassword());
-		if(commentService.checkPassword(id, comment.getPassword())) {
+		if(commentService.checkPassword(id, commentForm.getPassword())) {
 			System.out.println(commentService.findByComment(id).getBody());
 			model.addAttribute("comment", commentService.findByComment(id));
 			return "comment/commentForm";
@@ -115,5 +104,28 @@ public class CommentController {
 		else AlertMessage.alertAndBack(response, "비밀번호가 일치하지 않습니다.");
 		return "";
 	}
+	
+	// 댓글 삭제
+	@GetMapping("/comment/delete")
+	public String confirmDelete(@RequestParam(name="commentNo") Long id, Model model) {
+	
+		model.addAttribute("commentNo", id);
+		model.addAttribute("option", "delete");
+		return "comment/userConfirm";
+	}
+	
+	// 댓글 삭제 로직
+		@PostMapping("/api/comment/delete")
+		public void delete(@RequestParam(name="commentNo") Long id,
+				HttpServletResponse response, CommentForm commentForm) throws Exception {
+			
+			if(commentService.checkPassword(id, commentForm.getPassword())) {
+				commentService.delete(id);
+				AlertMessage.alertAndClose(response, "댓글이 정상적으로 삭제되었습니다.");
+			}
+			else AlertMessage.alertAndBack(response, "비밀번호가 일치하지 않습니다.");
+		}
+	
+	
 	
 }

@@ -26,9 +26,10 @@ public class UserService {
 	
 	// 회원가입
 	public Long join(User user) {
-		if(isName(user)!=null && isEmail(user)!=null) {
+		if(isName(user)==null && isEmail(user)==null) {
 			user.setPassword(encoder.encode(user.getPassword()));
 			userRepository.save(user);
+			System.out.println("저장");
 			return null;
 		} else return user.getId();
 	}
