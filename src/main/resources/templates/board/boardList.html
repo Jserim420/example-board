@@ -51,14 +51,14 @@
 		 
 		 <nav th:if="${boards}!=null" style="text-align: center;" aria-label="Page navigation">
 		    <ul class="pagination justify-content-center"
-		        th:with="start=${(boards.number/10)*10 + 1},
-		                    last=(${start + 9 < boards.totalPages ? start + 9 : boards.totalPages})">
+		        th:with="start=${(boards.number/5)*5 + 1},
+		                    last=(${start + 4 < boards.totalPages ? start + 4 : boards.totalPages})">
 		        <li class="page-item">
 		            <a th:if="${keyword}==null" class="page-link" th:href="@{|/?page=1|}" aria-label="First">
 		                <span aria-hidden="true">처음</span>
 		            </a>
 		            <a th:if="${keyword}!=null" class="page-link" th:href="@{|/board/search?selected=${selected}&keyword=${keyword}|}" aria-label="First">
-		            	<span aria-hidden="true">Start</span>
+		            	<span aria-hidden="true">처음</span>
 		            </a>
 		        </li>
 		
@@ -90,7 +90,7 @@
 		                <span aria-hidden="true">끝</span>
 		            </a>
 		            <a th:if="${keyword}!=null" class="page-link" th:href="@{|/board/search?selected=${selected}&keyword=${keyword}&page=${boards.totalPages}|}" aria-label="Last">
-		            	<span aria-hidden="true">End</span>
+		            	<span aria-hidden="true">끝</span>
 		            </a>
 		        </li>
 		    </ul>

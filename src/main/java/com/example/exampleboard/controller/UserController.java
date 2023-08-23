@@ -94,6 +94,8 @@ public class UserController {
 			Cookie cookie = new Cookie("userId", String.valueOf(loginId));
 			cookie.setMaxAge(10 * 60);
 			cookie.setPath("/");
+			cookie.setHttpOnly(true);	
+			cookie.setSecure(true);
 			response.addCookie(cookie);
 			
 			// System.out.println(cookie.getValue());
