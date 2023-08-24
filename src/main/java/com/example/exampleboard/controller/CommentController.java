@@ -28,7 +28,7 @@ public class CommentController {
 	
 	// 댓글 작성 로직
 	@PostMapping("/api/comment/write")
-	public void write(@CookieValue(name="userId", defaultValue = "") Long userId, 
+	public void write(@CookieValue(name="loginUser", defaultValue = "") String loginToken, 
 			@RequestParam(name="boardNo") Long boardId,
 			Board board, CommentForm commentForm,
 			HttpServletResponse response) throws Exception  {
@@ -75,7 +75,7 @@ public class CommentController {
 	public String confirm(@RequestParam(name="commentNo") Long id, Model model) {
 	
 		model.addAttribute("commentNo", id);
-		model.addAttribute("option", "modify");
+		model.addAttribute("option", "update");
 		return "comment/userConfirm";
 	}
 	

@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import com.example.exampleboard.model.Board;
 import com.example.exampleboard.model.User;
 import com.example.exampleboard.service.BoardService;
+import com.example.exampleboard.service.JwtProvider;
 import com.example.exampleboard.service.UserService;
 
 
@@ -25,27 +26,28 @@ public class HomeController {
 	
 	private final UserService userService;
 	private final BoardService boardService;
+	private final JwtProvider jwtProvider;
 
 	@Autowired
-	public HomeController(UserService userService, BoardService boardService) {
+	public HomeController(UserService userService, BoardService boardService, JwtProvider jwtProvider) {
 		this.userService = userService;
 		this.boardService = boardService;
+		this.jwtProvider = jwtProvider;
 	}
 	
 	
 	// WelcomePage
 	@GetMapping("/")
-	public String boardList(@CookieValue(name = "userId", required = false) Long userId, Model model,
+	public String boardList(@CookieValue(name = "loginUser", required = false) String loginToken, Model model,
 							@PageableDefault(page=0, size=10, sort="writeDate", direction = Sort.Direction.DESC) Pageable pageable) {
-	    System.out.println("로그인한 사용자 : " + userId);
-	    
-	   
-	    if (userId != null) {
-	        User loginUser = userService.findUser(userId);
-	        model.addAttribute("user", loginUser);
-	    } else {
-	        model.addAttribute("user", null);
-	    }
+
+		if(loginToken==null) model.addAttribute("user", null);
+		else {
+			System.out.println("로그인한 사용자토큰 : " + loginToken);
+		    System.out.println(jwtProvider.getToken("Id", loginToken));
+		    User loginUser = userService.findUser(jwtProvider.getToken("Id", loginToken));
+		    model.addAttribute("user", loginUser);
+		}
 	    
 	    Page<Board> boardList = boardService.boardList(pageable);
 //	    System.out.println("총 element 수 :" +  boardList.getTotalElements() + " 전체 page 수 : " + boardList.getTotalPages()

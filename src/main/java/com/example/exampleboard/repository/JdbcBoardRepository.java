@@ -138,7 +138,6 @@ public class JdbcBoardRepository {
 			board.setId(rs.getLong("id"));
 			board.setTitle(rs.getString("title"));
 			board.setBody(rs.getString("body"));
-			board.setWriteDate(rs.getDate("writeDate"));
 			board.setUserId(rs.getLong("userId"));
 			board.setViewCount(rs.getInt("viewCount"));
 			board.setLikeCount(rs.getInt("LikeCount"));

@@ -10,6 +10,7 @@ import com.example.exampleboard.repository.JpaCommentRepository;
 import com.example.exampleboard.repository.JpaUserRepository;
 import com.example.exampleboard.service.BoardService;
 import com.example.exampleboard.service.CommentService;
+import com.example.exampleboard.service.JwtProvider;
 import com.example.exampleboard.service.UserService;
 
 
@@ -42,6 +43,11 @@ public class SpringConfig {
 	@Bean
 	public CommentService commentService() {
 		return new CommentService(commentRepository);
+	}
+	
+	@Bean
+	public JwtProvider jwtProvider() {
+		return new JwtProvider();
 	}
 	
 	

@@ -10,8 +10,10 @@ import org.springframework.web.bind.annotation.PostMapping;
 
 import com.example.exampleboard.AlertMessage;
 import com.example.exampleboard.model.User;
+import com.example.exampleboard.service.JwtProvider;
 import com.example.exampleboard.service.UserService;
 
+import groovyjarjarantlr4.v4.parse.ANTLRParser.finallyClause_return;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletResponse;
 
@@ -19,16 +21,18 @@ import jakarta.servlet.http.HttpServletResponse;
 public class UserController {
 	
 	private final UserService userService;
+	private final JwtProvider jwtProvider;
 	
 	@Autowired
-	public UserController(UserService userService) {
+	public UserController(UserService userService, JwtProvider jwtProvider) {
 		this.userService = userService;
+		this.jwtProvider = jwtProvider;
 	}
 	
 	// 로그아웃
 	@GetMapping(value="/user/logout")
 	public String logout(HttpServletResponse response) {
-		Cookie cookie = new Cookie("userId", null); // 쿠키삭제
+		Cookie cookie = new Cookie("loginUser", null); // 쿠키삭제
 		cookie.setMaxAge(0); 
 		cookie.setPath("/");
 		response.addCookie(cookie);
@@ -89,9 +93,11 @@ public class UserController {
 		else if(userService.checkUser(user)==false || userService.isEmail(user)==null)  AlertMessage.alertAndBack(response, "아이디/비밀번호가 일치하지 않습니다.");
 		else {
 			//로그인 성공
-			Long loginId = userService.isEmail(user).getId();
-			System.out.println("로그인유저" + loginId);
-			Cookie cookie = new Cookie("userId", String.valueOf(loginId));
+			User findUser = userService.isEmail(user);
+			String createToken = jwtProvider.generateToken(findUser);
+
+			System.out.println(createToken);
+			Cookie cookie = new Cookie("loginUser", createToken);
 			cookie.setMaxAge(10 * 60);
 			cookie.setPath("/");
 			cookie.setHttpOnly(true);	

@@ -24,8 +24,10 @@ import com.example.exampleboard.model.Comment;
 import com.example.exampleboard.model.User;
 import com.example.exampleboard.service.BoardService;
 import com.example.exampleboard.service.CommentService;
+import com.example.exampleboard.service.JwtProvider;
 import com.example.exampleboard.service.UserService;
 
+import groovyjarjarantlr4.v4.parse.ANTLRParser.finallyClause_return;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
@@ -35,21 +37,25 @@ public class BoardController {
 	private final BoardService boardService;
 	private final UserService userService;
 	private final CommentService commentService;
+	private final JwtProvider jwtProvider;
 	
 	@Autowired
-	public BoardController(BoardService boardService, UserService userService, CommentService commentService) {
+	public BoardController(BoardService boardService, UserService userService, 
+			CommentService commentService, JwtProvider jwtProvider) {
 		this.boardService = boardService;
 		this.userService = userService;
 		this.commentService = commentService;
+		this.jwtProvider = jwtProvider;
 	}
 
 	
 	
 	// 글쓰기
 	@GetMapping("/board/write")
-	public String boardWrite(@CookieValue(name = "userId", required = false) Long userId, Model model, User user, HttpServletResponse response) throws Exception {
-		System.out.println(userId);
-		if (userId != null) {  // 사용자가 로그인 상태라면
+	public String boardWrite(@CookieValue(name = "loginUser", required = false) String loginToken, Model model, User user, HttpServletResponse response) throws Exception {
+		System.out.println(loginToken);
+		if (loginToken != null) {  // 사용자가 로그인 상태라면
+			Long userId = jwtProvider.getToken("Id", loginToken);
 			User loginUser = userService.findUser(userId);
 			model.addAttribute("user", loginUser);
 			model.addAttribute("board", null);
@@ -66,7 +72,7 @@ public class BoardController {
 	
 	// 글쓰기 로직
 	@PostMapping("/api/board/write")
-	public void boardSave(@CookieValue(name = "userId", required = false) Long userId, 
+	public void boardSave(@CookieValue(name = "loginUser", required = false) String loginToken, 
 			HttpServletResponse response,
 			Model model, BoardForm boardForm) throws Exception {
 		Board board = new Board();
@@ -75,7 +81,7 @@ public class BoardController {
 		
 		board.setTitle(boardForm.getTitle());
 		board.setBody(boardForm.getBody());
-		board.setUserId(userId);
+		board.setUserId(jwtProvider.getToken("Id", loginToken));
 		board.setWriteDate(simpleDateFormat.format(date));
 		board.setViewCount(0);
 		board.setLikeCount(0);
@@ -90,10 +96,11 @@ public class BoardController {
 	
 	// 게시글 조회
 	@GetMapping("/board")
-	public String boardView(@RequestParam(name = "boardNo") Long id, 
-			@CookieValue(name = "userId", required = false) Long userId, 
+	public String boardView(@RequestParam(name = "boardNo") Long boardId, 
+			@CookieValue(name = "loginUser", required = false) String loginToken, 
 			Model model, HttpServletResponse response, HttpServletRequest request) throws Exception {
-		if (userId != null) { // 로그인한 사용자가 게시글 작성자인지 확인하기 위해  model 에 값 전달
+		if (loginToken != null) { // 로그인한 사용자가 게시글 작성자인지 확인하기 위해  model 에 값 전달
+			Long userId = jwtProvider.getToken("Id", loginToken);
 			User loginUser = userService.findUser(userId);
 			model.addAttribute("user", loginUser);
 		}
@@ -101,10 +108,10 @@ public class BoardController {
 		
 		System.out.println("test");
 		// 조회수 증가
-		boardService.updateCount(id, request, response, "view");
+		boardService.updateCount(boardId, request, response, "view");
 		System.out.println("test2");
 		// 게시글 찾기
-		Board findBoards = boardService.findBoard(id);
+		Board findBoards = boardService.findBoard(boardId);
 		System.out.println(findBoards.getViewCount());
 		model.addAttribute("board", findBoards);
 		String writerName = userService.findUser(findBoards.getUserId()).getName();
@@ -121,10 +128,11 @@ public class BoardController {
 
 	// 게시글 수정
 	@GetMapping("/board/modify")
-	public String modify(@CookieValue(name="userId", required = false) Long userId, Model model,
+	public String modify(@CookieValue(name="loginUser", required = false)String loginToken, Model model,
 			@RequestParam(name="boardNo") Long id, HttpServletResponse response) throws Exception {
 		Board findBoard = boardService.findBoard(id);
-		if(userId==null | userId!=findBoard.getUserId()) {
+		Long userId = jwtProvider.getToken("Id", loginToken);
+		if(loginToken==null | userId!=findBoard.getUserId()) {
 			AlertMessage.alertAndBack(response, "게시글 수정은 게시글 작성자만 할 수 있습니다.");
 			return null;
 		} else { 
@@ -159,9 +167,9 @@ public class BoardController {
 //	
 	// 게시글 삭제
 	@GetMapping("/board/delete")
-	public String delete(@RequestParam(name="boardNo") Long boardId, @CookieValue(name="userId", required = false) Long userId,
+	public String delete(@RequestParam(name="boardNo") Long boardId, @CookieValue(name="loginUser", required = false) String loginToken,
 			HttpServletResponse response) throws Exception {
-		if(userId!=boardService.findBoard(boardId).getUserId()) AlertMessage.alertAndBack(response, "게시글 삭제는 게시글 작성자만 할 수 있습니다.");
+		if(jwtProvider.getToken("Id", loginToken)!=boardService.findBoard(boardId).getUserId()) AlertMessage.alertAndBack(response, "게시글 삭제는 게시글 작성자만 할 수 있습니다.");
 		else boardService.delete(boardId);
 		
 		return "redirect:/";
@@ -170,11 +178,14 @@ public class BoardController {
 	// 게시글 좋아요
 	@GetMapping("/api/board/like")
 	public String updateLike(@RequestParam(name="boardNo") Long boardId, Board board, BoardForm boardForm, 
-			@CookieValue(name="userId", required = false) Long userId,
+			@CookieValue(name="loginUser", required = false) String loginToken,
 			HttpServletResponse response, HttpServletRequest request) throws Exception {
 		System.out.println("좋아요");
-		if(userId==boardService.findBoard(boardId).getUserId()) AlertMessage.alertAndBack(response, "내 글에는 좋아요를 누를 수 없습니다.");
-		else boardService.updateCount(boardId, request, response, "like");
+		if(loginToken==null) boardService.updateCount(boardId, request, response, "like");
+		else {
+			if(jwtProvider.getToken("Id", loginToken)==boardService.findBoard(boardId).getUserId()) AlertMessage.alertAndBack(response, "내 글에는 좋아요를 누를 수 없습니다.");
+			else boardService.updateCount(boardId, request, response, "like");
+		}
 		return "redirect:/board?boardNo=" + boardId;
 	}
 	
@@ -183,7 +194,7 @@ public class BoardController {
 //	
 	// 게시글 검색
 	@GetMapping("/board/search")
-	public String search(@CookieValue(name="userId",  required = false) Long userId,
+	public String search(@CookieValue(name="loginUser",  required = false) String loginToken,
 			Model model,
 			@RequestParam(name="selected") String selected,
 			@RequestParam(name="keyword") String keyword,
@@ -192,6 +203,7 @@ public class BoardController {
 		if(keyword.equals("")) AlertMessage.alertAndBack(response, "검색어를 입력해주세요.");
 		else if(selected.equals("")) AlertMessage.alertAndBack(response, "검색범위를 설정해주세요");
 		else {	
+			model.addAttribute("user", userService.findUser(jwtProvider.getToken("Id", loginToken)));
 		    model.addAttribute("keyword", keyword);
 		    model.addAttribute("selected", selected);
 		    
