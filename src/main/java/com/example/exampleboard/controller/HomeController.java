@@ -17,10 +17,12 @@ import com.example.exampleboard.service.BoardService;
 import com.example.exampleboard.service.JwtProvider;
 import com.example.exampleboard.service.UserService;
 
+import lombok.extern.slf4j.Slf4j;
 
 
 
 
+@Slf4j
 @Controller
 public class HomeController {
 	
@@ -41,18 +43,20 @@ public class HomeController {
 	public String boardList(@CookieValue(name = "loginUser", required = false) String loginToken, Model model,
 							@PageableDefault(page=0, size=10, sort="writeDate", direction = Sort.Direction.DESC) Pageable pageable) {
 
-		if(loginToken==null) model.addAttribute("user", null);
+		if(loginToken==null) {
+			log.info("로그인 유저 => [ 비회원 ]");
+			model.addAttribute("user", null);
+		}
 		else {
-			System.out.println("로그인한 사용자토큰 : " + loginToken);
-		    System.out.println(jwtProvider.getToken("Id", loginToken));
 		    User loginUser = userService.findUser(jwtProvider.getToken("Id", loginToken));
+		    log.info("로그인 유저 => [ 토큰 : {} , 아이디 : {} , 닉네임 : {} ]" , 
+		    		loginToken, loginUser.getEmail(), loginUser.getName() );
 		    model.addAttribute("user", loginUser);
 		}
 	    
 	    Page<Board> boardList = boardService.boardList(pageable);
-//	    System.out.println("총 element 수 :" +  boardList.getTotalElements() + " 전체 page 수 : " + boardList.getTotalPages()
-//	    							+ " 페이지에 표시할 element 수 : " + boardList.getSize() + " 현재 페이지 index : " +  boardList.getNumber() 
-//	    							+ " 현재 페이지의 element 수 : " + boardList.getNumberOfElements());
+	    log.info("페이징 조회 => [ 총 element 수 : {} , 전체 page 수 : {} , 페이지에 표시할 element 수 : {} , 현재 페이지 index : {}, 현재 페이지의 element 수 : {} ]",
+	    		boardList.getTotalElements(), boardList.getTotalPages(), boardList.getSize(), boardList.getNumber(), boardList.getNumberOfElements() );
 	    
 	    model.addAttribute("boards", boardList);
 

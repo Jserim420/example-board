@@ -9,7 +9,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
-import org.springframework.security.web.authentication.rememberme.CookieTheftException;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.example.exampleboard.AlertMessage;
@@ -19,7 +18,9 @@ import com.example.exampleboard.repository.JpaBoardRepository;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 @Transactional
 public class BoardService {
 	
@@ -33,7 +34,7 @@ public class BoardService {
 	
 	// 글 작성
 	public Board write(Board board) {
-		return boardRepository.save(board); 
+		return  boardRepository.save(board);
 	}
 	
 	// 글 찾기
@@ -122,7 +123,6 @@ public class BoardService {
 	     	} else if(option.equals("like")) {
 	     		cookie = new Cookie("Like"+id, String.valueOf(id));
 	     	} else return null;
-	        cookie.setComment("조회수 중복 증가 방지 쿠키");	// 쿠키 용도 설명 기재
 	        cookie.setMaxAge(getForTommorow()); 	// 하루
 	        cookie.setHttpOnly(true);				// 서버에서만 조작 가능
 	        return cookie;

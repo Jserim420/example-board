@@ -5,6 +5,7 @@ package com.example.exampleboard.controller;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.CookieValue;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 
@@ -16,7 +17,9 @@ import com.example.exampleboard.service.UserService;
 import groovyjarjarantlr4.v4.parse.ANTLRParser.finallyClause_return;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletResponse;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 @Controller
 public class UserController {
 	
@@ -31,11 +34,15 @@ public class UserController {
 	
 	// 로그아웃
 	@GetMapping(value="/user/logout")
-	public String logout(HttpServletResponse response) {
-		Cookie cookie = new Cookie("loginUser", null); // 쿠키삭제
-		cookie.setMaxAge(0); 
-		cookie.setPath("/");
-		response.addCookie(cookie);
+	public String logout(HttpServletResponse response, @CookieValue(name = "loginUser") String loginToken) {
+		if(loginToken==null) log.warn("잘못된 접근 : 로그인사용자 없음");
+		else { 
+			Cookie cookie = new Cookie("loginUser", null); // 쿠키삭제
+			cookie.setMaxAge(0); 
+			cookie.setPath("/");
+			response.addCookie(cookie);
+			log.info("로그아웃 사용자 [ 아이디 : {} ]", jwtProvider.getToken("id", loginToken));
+		}
 		return "redirect:/";
 	}
 	
@@ -47,7 +54,7 @@ public class UserController {
 	
 	// 회원가입 로직
 	@PostMapping(value = "/api/user/signup")
-	public String create(UserForm form, Model model, HttpServletResponse response) throws Exception {
+	public void create(UserForm form, Model model, HttpServletResponse response) throws Exception {
 		User user = new User();
 		user.setEmail(form.getEmail());
 		user.setPassword(form.getPassword());
@@ -63,12 +70,17 @@ public class UserController {
 			if(userService.isName(user)!=null) AlertMessage.alertAndBack(response, "이미 존재하는 닉네임입니다.");
 			else if(userService.isEmail(user)!=null) AlertMessage.alertAndBack(response, "이미 가입된 이메일입니다.");
 			else {
-				userService.join(user);
+				try {
+					userService.join(user);
+				} catch(Exception e) {
+					log.warn("회원가입 문제 발생 => {}", e.getMessage());
+					AlertMessage.alertAndBack(response, "회원가입 도중 예상치 못한 문제가 발생하였습니다. 잠시 후 다시 시도해 주세요.");
+				} 
+				
 				AlertMessage.alertAndMove(response, "회원가입에 성공했습니다.", "/login"); 
+				
 			}
 		}
-	
-		return "login";
 	}
 	
 	// 로그인
@@ -92,20 +104,27 @@ public class UserController {
 		else if(!user.getEmail().contains("@")) AlertMessage.alertAndBack(response, "올바르지 않은 이메일 형식입니다.");
 		else if(userService.checkUser(user)==false || userService.isEmail(user)==null)  AlertMessage.alertAndBack(response, "아이디/비밀번호가 일치하지 않습니다.");
 		else {
-			//로그인 성공
-			User findUser = userService.isEmail(user);
-			String createToken = jwtProvider.generateToken(findUser);
-
-			System.out.println(createToken);
-			Cookie cookie = new Cookie("loginUser", createToken);
-			cookie.setMaxAge(10 * 60);
-			cookie.setPath("/");
-			cookie.setHttpOnly(true);	
-			cookie.setSecure(true);
-			response.addCookie(cookie);
+			//로그인 검증
+			User findUser=null;
+			String createToken=null;
+			try {
+				findUser = userService.isEmail(user);
+				createToken = jwtProvider.generateToken(findUser);
+			} catch (Exception e1) {
+				log.warn("사용자 [ 아이디 : {}, 비밀번호 : {} ] 로그인 문제 발생 => {}", user.getEmail(), user.getPassword(), e1.getMessage());
+				AlertMessage.alertAndBack(response, "로그인 도중 예상치 못한 문제가 발생했습니다. 잠시 후 다시 시도해주세요.");
+			}
 			
-			// System.out.println(cookie.getValue());
-			AlertMessage.alertAndMove(response, "어서오세요 :)", "/");
+				Cookie cookie = new Cookie("loginUser", createToken);
+				cookie.setMaxAge(10 * 60);
+				cookie.setPath("/");
+				cookie.setHttpOnly(true);	
+				cookie.setSecure(true);
+				response.addCookie(cookie);
+				
+				log.info("사용자 로그인 완료 : {}", user.getEmail());
+				AlertMessage.alertAndMove(response, "어서오세요 :)", "/");
+			
 		}
 	}
 	
