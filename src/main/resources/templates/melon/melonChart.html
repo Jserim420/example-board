@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="layout/default_layout">
+
+  <th:block layout:fragment="content">
+	<div class="container" style="margin-bottom: 50px;">
+	
+		<div style="text-align:center;">
+		<h2 th:text="${time} + ' 🔥 실시간 HOT100 🔥'"></h2>
+		</div>
+		
+		<table class="table" style="text-align: center;">
+		  <thead class="table-light">
+		    <tr>
+		      <th scope="col">순위</th>
+		      <th scope="col">제목</th>
+		      <th scope="col">가수</th>
+		      <th scope="col">좋아요</th>
+		      <th scope="col">들으러 가기</th>
+		    </tr>
+		  </thead>
+		  <tbody class="table-group-divider">
+		    <tr th:each="chart : ${charts}">
+		    	<td th:text="${chart.rank}"></td>
+		    	<td><a th:text="${chart.title}" th:href="@{|/chart/detail?no=${chart.songNumber}|}" style="text-decoration: none; font-weight: bold;"></a></td>
+		    	<td th:text="${chart.singer}"></td>
+		    	<td th:text="'💗 ' + ${chart.likeCount}"></td>
+		    	<td> <a th:href="'https://www.melon.com/song/detail.htm?songId='+ ${chart.songNumber}" target="_blank" style="text-decoration: none;">🎵</a></td>
+		    </tr>
+		  </tbody>
+		</table>
+		
+		
+		<nav style="text-align: center;" aria-label="Page navigation">
+		    <ul class="pagination justify-content-center">
+		        <li class="page-item" th:each="page: ${#numbers.sequence(1,10)}">
+		            <a class="page-link" th:text="${page}" th:href="@{|/chart?page=${page-1}|}"></a>
+		        </li>
+		    </ul>
+		</nav>
+		
+	</div>
+	
+	
+	
+  </th:block>
+
+</html>
+

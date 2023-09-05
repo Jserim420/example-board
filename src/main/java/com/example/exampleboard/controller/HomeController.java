@@ -1,6 +1,10 @@
 package com.example.exampleboard.controller;
 
 
+import java.util.ArrayList;
+import java.util.List;
+
+import org.openqa.selenium.WebElement;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -11,7 +15,9 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.CookieValue;
 import org.springframework.web.bind.annotation.GetMapping;
 
+import com.example.exampleboard.MelonSelenium;
 import com.example.exampleboard.model.Board;
+import com.example.exampleboard.model.Melon;
 import com.example.exampleboard.model.User;
 import com.example.exampleboard.service.BoardService;
 import com.example.exampleboard.service.JwtProvider;
@@ -42,7 +48,8 @@ public class HomeController {
 	@GetMapping("/")
 	public String boardList(@CookieValue(name = "loginUser", required = false) String loginToken, Model model,
 							@PageableDefault(page=0, size=10, sort="writeDate", direction = Sort.Direction.DESC) Pageable pageable) {
-
+		
+		
 		if(loginToken==null) {
 			log.info("로그인 유저 => [ 비회원 ]");
 			model.addAttribute("user", null);
@@ -55,11 +62,15 @@ public class HomeController {
 		}
 	    
 	    Page<Board> boardList = boardService.boardList(pageable);
+		
+		
 	    log.info("페이징 조회 => [ 총 element 수 : {} , 전체 page 수 : {} , 페이지에 표시할 element 수 : {} , 현재 페이지 index : {}, 현재 페이지의 element 수 : {} ]",
 	    		boardList.getTotalElements(), boardList.getTotalPages(), boardList.getSize(), boardList.getNumber(), boardList.getNumberOfElements() );
-	    
-	    model.addAttribute("boards", boardList);
 
+	    model.addAttribute("boards", boardList);
+	    
+	    
+	    
 	    return "board/boardList";
 	}
 	

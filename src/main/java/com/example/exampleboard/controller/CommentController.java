@@ -110,7 +110,8 @@ public class CommentController {
 						 commentId, commentService.findByComment(commentId).getBoardId(), e.getMessage() );
 				AlertMessage.alertAndBack(response, "문제가 발생했습니다. 잠시 후 다시 시도해주세요.");
 			}
-			log.info("댓글 [ 번호 : {} , 글번호 : {} ] 수정완료 ");
+			log.info("댓글 [ 번호 : {} , 글번호 : {} ] 수정완료 \n => 본문 : {}", 
+					commentId, commentService.findByComment(commentId).getBoardId(), commentForm.getBody() );
 			AlertMessage.alertAndClose(response, "댓글이 정상적으로 수정되었습니다.");
 		}
 		

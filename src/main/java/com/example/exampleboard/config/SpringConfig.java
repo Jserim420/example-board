@@ -5,6 +5,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
+import com.example.exampleboard.MelonSelenium;
 import com.example.exampleboard.repository.JpaBoardRepository;
 import com.example.exampleboard.repository.JpaCommentRepository;
 import com.example.exampleboard.repository.JpaUserRepository;
@@ -48,6 +49,11 @@ public class SpringConfig {
 	@Bean
 	public JwtProvider jwtProvider() {
 		return new JwtProvider();
+	}
+	
+	@Bean
+	public MelonSelenium melonSelenium() {
+		return new MelonSelenium();
 	}
 	
 	

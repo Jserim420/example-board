@@ -73,10 +73,11 @@ public class UserController {
 				try {
 					userService.join(user);
 				} catch(Exception e) {
-					log.warn("회원가입 문제 발생 => {}", e.getMessage());
-					AlertMessage.alertAndBack(response, "회원가입 도중 예상치 못한 문제가 발생하였습니다. 잠시 후 다시 시도해 주세요.");
+					log.warn("회원가입 문제 발생 => {} \n 아이디 : {} , 비밀번호 : {} , 닉네임 : {}", 
+							e.getMessage(), user.getEmail(), user.getPassword(), user.getName());
+					AlertMessage.alertAndBack(response, "회원가입 도중 문제가 발생하였습니다. 잠시 후 다시 시도해 주세요.");
 				} 
-				
+				log.info("회원가입 성공 => 아이디 : {} , 비밀번호 : {} , 닉네임 : {}" , user.getEmail(), user.getPassword(), user.getName());
 				AlertMessage.alertAndMove(response, "회원가입에 성공했습니다.", "/login"); 
 				
 			}
@@ -111,8 +112,8 @@ public class UserController {
 				findUser = userService.isEmail(user);
 				createToken = jwtProvider.generateToken(findUser);
 			} catch (Exception e1) {
-				log.warn("사용자 [ 아이디 : {}, 비밀번호 : {} ] 로그인 문제 발생 => {}", user.getEmail(), user.getPassword(), e1.getMessage());
-				AlertMessage.alertAndBack(response, "로그인 도중 예상치 못한 문제가 발생했습니다. 잠시 후 다시 시도해주세요.");
+				log.warn("로그인 문제 발생 => {} \n 사용자 [ 아이디 : {}, 비밀번호 : {} ] ", e1.getMessage(), user.getEmail(), user.getPassword());
+				AlertMessage.alertAndBack(response, "로그인 도중 문제가 발생했습니다. 잠시 후 다시 시도해주세요.");
 			}
 			
 				Cookie cookie = new Cookie("loginUser", createToken);
